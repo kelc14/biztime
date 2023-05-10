@@ -13,13 +13,11 @@ const db = require("../db");
 
 router.get("/", async (req, res, next) => {
   try {
-    const result = await db.query(
-      `SELECT * FROM invoices JOIN companies ON invoices.comp_code = companies.code`
-    );
+    const result = await db.query(`SELECT id, comp_code FROM invoices`);
     // create invoices with company info for each invoice
-    const invoices = result.rows.map((x) => helpers.createInvoice(x));
+    // const invoices = result.rows.map((x) => helpers.createInvoice(x));
 
-    return res.json({ invoices: invoices });
+    return res.json({ invoices: result.rows[0] });
   } catch (e) {
     return next(e);
   }
@@ -50,10 +48,10 @@ router.post("/", async (req, res, next) => {
     const { comp_code, amt } = req.body;
 
     const results = await db.query(
-      "INSERT INTO invoices (comp_code, amt) VALUES ($1, $2) RETURNING *",
+      "INSERT INTO invoices (comp_code, amt) VALUES ($1, $2) RETURNING id, comp_code",
       [comp_code, amt]
     );
-    return res.status(201).json({ invoice: results.rows[0] });
+    return res.status(201).json({ invoices: results.rows[0] });
   } catch (e) {
     return next(e);
   }
