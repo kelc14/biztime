@@ -37,17 +37,17 @@ describe("GET /invoices", () => {
     const res = await request(app).get("/invoices");
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual({
-      invoices: { id: testInvoice.id, comp_code: testInvoice.comp_code },
+      invoices: [
+        {
+          id: testInvoice.id,
+          comp_code: testInvoice.comp_code,
+        },
+      ],
     });
   });
 });
 
 describe("GET /invoices/:id", () => {
-  // date not matching for this:
-
-  // -     "add_date": 2023-05-10T04:00:00.000Z,
-  // +     "add_date": "2023-05-10T04:00:00.000Z",
-
   test("Get details of an invoice by id", async () => {
     const res = await request(app).get(`/invoices/${testInvoice.id}`);
 
@@ -86,11 +86,7 @@ describe("POST /invoices", () => {
 });
 
 describe("PUT /invoices/:id", () => {
-  // date does not match for this:
-  // -     "add_date": 2023-05-10T04:00:00.000Z,
-  // +     "add_date": "2023-05-10T04:00:00.000Z",
-
-  test("Update an invoice", async () => {
+  test("Update an invoice without paid", async () => {
     const res = await request(app).put(`/invoices/${testInvoice.id}`).send({
       amt: 99,
     });
