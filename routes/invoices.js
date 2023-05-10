@@ -33,6 +33,7 @@ router.get("/:id", async (req, res, next) => {
     if (result.rows.length === 0) {
       throw new ExpressError(`Invoice id ${id} not found`, 404);
     }
+    debugger;
     // create invoice with company data included :
     const data = result.rows[0];
     const invoice = helpers.createInvoice(data);
@@ -59,8 +60,12 @@ router.post("/", async (req, res, next) => {
 
 router.put("/:id", async (req, res, next) => {
   try {
-    const { amt } = req.body;
+    const { amt, paid } = req.body;
     const { id } = req.params;
+
+    // if paying: let paid_date = new Date().toJSON();
+    // if not paying paid = null
+    // else if already paid keep the same
 
     const results = await db.query(
       "UPDATE invoices SET amt=$1 WHERE id=$2 RETURNING *",

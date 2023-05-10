@@ -9,7 +9,7 @@ let testInvoice;
 beforeEach(async () => {
   const result = await db.query(
     `INSERT INTO companies
-    VALUES ('sb', 'Springboard', 'Online learning.') 
+    VALUES ('springboard', 'Springboard', 'Online learning.') 
     RETURNING *;`
   );
 
@@ -50,12 +50,20 @@ describe("GET /companies/:code", () => {
 describe("POST /invoices", () => {
   test("Add a company", async () => {
     const res = await request(app).post(`/companies`).send({
-      code: "ibm",
       name: "IBM",
       description: "Big blue.",
     });
 
     expect(res.statusCode).toBe(201);
+  });
+
+  test("Add a company that already exists, 400 error", async () => {
+    const res = await request(app).post(`/companies`).send({
+      name: "Springboard",
+      description: "Big blue.",
+    });
+
+    expect(res.statusCode).toBe(400);
   });
 });
 

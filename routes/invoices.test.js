@@ -1,5 +1,6 @@
 // Tell Node that we're in test "mode"
 process.env.NODE_ENV = "test";
+const FIXED_SYSTEM_TIME = "2020-11-18T00:00:00Z";
 
 const request = require("supertest");
 const app = require("../app");
@@ -47,25 +48,25 @@ describe("GET /invoices/:id", () => {
   // -     "add_date": 2023-05-10T04:00:00.000Z,
   // +     "add_date": "2023-05-10T04:00:00.000Z",
 
-  //   test("Get details of an invoice by id", async () => {
-  //     const res = await request(app).get(`/invoices/${testInvoice.id}`);
+  test("Get details of an invoice by id", async () => {
+    const res = await request(app).get(`/invoices/${testInvoice.id}`);
 
-  //     const invoice = {
-  //       id: testInvoice.id,
-  //       company: {
-  //         code: testCompany.code,
-  //         name: testCompany.name,
-  //         description: testCompany.description,
-  //       },
-  //       amt: testInvoice.amt,
-  //       paid: testInvoice.paid,
-  //       add_date: testInvoice.add_date,
-  //       paid_date: testInvoice.paid_date,
-  //     };
+    const invoice = {
+      id: testInvoice.id,
+      company: {
+        code: testCompany.code,
+        name: testCompany.name,
+        description: testCompany.description,
+      },
+      amt: testInvoice.amt,
+      paid: testInvoice.paid,
+      add_date: testInvoice.add_date.toISOString(),
+      paid_date: testInvoice.paid_date,
+    };
 
-  //     expect(res.statusCode).toBe(200);
-  //     expect(res.body).toEqual({ invoice: invoice });
-  //   });
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ invoice: invoice });
+  });
 
   test("Attempt to get details of an invoice that does not exist", async () => {
     const res = await request(app).get(`/invoices/0`);
@@ -89,14 +90,15 @@ describe("PUT /invoices/:id", () => {
   // -     "add_date": 2023-05-10T04:00:00.000Z,
   // +     "add_date": "2023-05-10T04:00:00.000Z",
 
-  //   test("Update an invoice", async () => {
-  //     const res = await request(app).put(`/invoices/${testInvoice.id}`).send({
-  //       amt: 99,
-  //     });
-  //     testInvoice.amt = 99;
-  //     expect(res.statusCode).toBe(200);
-  //     expect(res.body).toEqual({ invoice: testInvoice });
-  //   });
+  test("Update an invoice", async () => {
+    const res = await request(app).put(`/invoices/${testInvoice.id}`).send({
+      amt: 99,
+    });
+    testInvoice.amt = 99;
+    (testInvoice.add_date = testInvoice.add_date.toISOString()),
+      expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ invoice: testInvoice });
+  });
 
   test("Attempt to update an invoice that does not exist", async () => {
     const res = await request(app).put(`/invoices/0`).send({
